@@ -14,11 +14,12 @@ categories = ["development-tools::debugging"]
 keywords = ["logging", "log", "logger"]
 
 [dependencies]
-log = { version = "0.4.0", features = ["std"] }
+log = { version = "0.4.0", features = ["std"], path = "../log" }
 regex = { version = "0.2", optional = true }
 termcolor = "0.3"
 chrono = "0.4"
 atty = "0.2"
+serde_json = "1"
 
 [[test]]
 name = "regexp_filter"

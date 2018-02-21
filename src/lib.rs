@@ -156,6 +156,7 @@ extern crate log;
 extern crate termcolor;
 extern crate chrono;
 extern crate atty;
+extern crate serde_json;
 
 use std::env;
 use std::borrow::Cow;
@@ -258,7 +259,7 @@ impl Builder {
         Builder {
             filter: Default::default(),
             writer: Default::default(),
-            format: Box::new(|buf, record| {
+            format: Box::new(|mut buf, record| {
                 let ts = buf.timestamp();
                 let level = record.level();
                 let mut level_style = buf.style();
@@ -271,12 +272,37 @@ impl Builder {
                     Level::Error => level_style.set_color(Color::Red).set_bold(true),
                 };
 
-                if let Some(module_path) = record.module_path() {
-                    writeln!(buf, "{:>5} {}: {}: {}", level_style.value(level), ts, module_path, record.args())
+                let mut write = if let Some(module_path) = record.module_path() {
+                    write!(buf, "{:>5} {}: {}: {}", level_style.value(level), ts, module_path, record.args())
                 }
                 else {
-                    writeln!(buf, "{:>5} {}: {}", level_style.value(level), ts, record.args())
+                    write!(buf, "{:>5} {}: {}", level_style.value(level), ts, record.args())
+                };
+
+                let properties = record.properties();
+                if properties.any() {
+                    write = write.and(write!(buf, " ("));
+                    
+                    let mut first = true;
+                    for (k, v) in properties {
+                        let sep = if first {
+                            first = false;
+                            ""
+                        }
+                        else {
+                            ", "
+                        };
+
+                        write = write
+                            .and(write!(buf, "{}{}: ", sep, k))
+                            .and(serde_json::to_writer(&mut buf, v)
+                                .map_err(|e| io::Error::new(io::ErrorKind::Other, e)));
+                    }
+
+                    write = write.and(write!(buf, ")"));
                 }
+
+                write.and(writeln!(buf))
             }),
         }
     }
