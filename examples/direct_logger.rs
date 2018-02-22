@@ -19,7 +19,10 @@ fn record() -> log::Record<'static> {
         .line(Some(433))
         .file(Some("app.rs"))
         .module_path(Some("server"))
-        .properties(&(&[("service", &"My App" as &log::Serialize), ("id", &42)] as &[(&str, &log::Serialize)]))
+        .properties(&log::Properties::RawKeyValues(&[
+            ("service", &"My App"),
+            ("id", &42)
+        ]))
         .build()
 }
 
