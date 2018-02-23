@@ -284,7 +284,7 @@ impl Builder {
                     write = write.and(write!(buf, " ("));
                     
                     let mut first = true;
-                    for (k, v) in properties {
+                    for property in properties {
                         let sep = if first {
                             first = false;
                             ""
@@ -294,8 +294,8 @@ impl Builder {
                         };
 
                         write = write
-                            .and(write!(buf, "{}{}: ", sep, k))
-                            .and(serde_json::to_writer(&mut buf, v)
+                            .and(write!(buf, "{}{}: ", sep, property.key()))
+                            .and(serde_json::to_writer(&mut buf, property.value())
                                 .map_err(|e| io::Error::new(io::ErrorKind::Other, e)));
                     }
 
