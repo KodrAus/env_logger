@@ -263,20 +263,23 @@ impl Builder {
                 let ts = buf.timestamp();
                 let level = record.level();
                 let mut level_style = buf.style();
+                let mut brace_style = buf.style();
 
-                match level {
-                    Level::Trace => level_style.set_color(Color::White),
-                    Level::Debug => level_style.set_color(Color::Blue),
-                    Level::Info => level_style.set_color(Color::Green),
-                    Level::Warn => level_style.set_color(Color::Yellow),
-                    Level::Error => level_style.set_color(Color::Red).set_bold(true),
+                brace_style.set_color(Color::White).set_intense(false);
+
+                let level = match level {
+                    Level::Trace => level_style.set_color(Color::White).value("TCE"),
+                    Level::Debug => level_style.set_color(Color::Blue).value("DBG"),
+                    Level::Info => level_style.set_color(Color::Green).value("INF"),
+                    Level::Warn => level_style.set_color(Color::Yellow).value("WRN"),
+                    Level::Error => level_style.set_color(Color::Red).set_bold(true).value("ERR"),
                 };
 
                 let mut write = if let Some(module_path) = record.module_path() {
-                    write!(buf, "{:>5} {}: {}: {}", level_style.value(level), ts, module_path, record.args())
+                    write!(buf, "{}{} {} {}{} {}", brace_style.value("["), level, ts, module_path, brace_style.value("]"), record.args())
                 }
                 else {
-                    write!(buf, "{:>5} {}: {}", level_style.value(level), ts, record.args())
+                    write!(buf, "{}{} {}{} {}", brace_style.value("["), level, ts, brace_style.value("]"), record.args())
                 };
 
                 let properties = record.properties();
@@ -287,7 +290,7 @@ impl Builder {
                     for property in properties {
                         write = write
                             .and(writeln!(buf))
-                            .and(write!(buf, "    {}: ", property_style.value(property.key())))
+                            .and(write!(buf, "{}: ", property_style.value(property.key())))
                             .and(serde_json::to_writer_pretty(&mut buf, property.value())
                                 .map_err(|e| io::Error::new(io::ErrorKind::Other, e)));
                     }
