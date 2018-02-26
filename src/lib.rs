@@ -281,25 +281,16 @@ impl Builder {
 
                 let properties = record.properties();
                 if properties.any() {
-                    write = write.and(write!(buf, " ("));
-                    
-                    let mut first = true;
-                    for property in properties {
-                        let sep = if first {
-                            first = false;
-                            ""
-                        }
-                        else {
-                            ", "
-                        };
+                    let mut property_style = buf.style();
+                    property_style.set_bold(true);
 
+                    for property in properties {
                         write = write
-                            .and(write!(buf, "{}{}: ", sep, property.key()))
-                            .and(serde_json::to_writer(&mut buf, property.value())
+                            .and(writeln!(buf))
+                            .and(write!(buf, "    {}: ", property_style.value(property.key())))
+                            .and(serde_json::to_writer_pretty(&mut buf, property.value())
                                 .map_err(|e| io::Error::new(io::ErrorKind::Other, e)));
                     }
-
-                    write = write.and(write!(buf, ")"));
                 }
 
                 write.and(writeln!(buf))
