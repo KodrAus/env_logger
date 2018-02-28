@@ -39,6 +39,8 @@ use std::{io, fmt};
 use std::rc::Rc;
 use std::cell::RefCell;
 
+use log::properties::{Properties, KeyValues, KeyValue, Serializer};
+use serde_json;
 use termcolor::{ColorSpec, ColorChoice, Buffer, BufferWriter, WriteColor};
 use chrono::{DateTime, Utc};
 use chrono::format::Item;
@@ -198,6 +200,19 @@ impl Writer {
 pub(crate) struct Builder {
     target: Target,
     write_style: WriteStyle,
+}
+
+struct WriteProperties<'a>(&'a mut Formatter);
+
+impl<'a> Serializer for WriteProperties<'a> {
+    fn serialize_kv(&mut self, kv: &KeyValue) {
+        let mut property_style = self.0.style();
+        property_style.set_bold(true);
+
+        let _ = writeln!(self.0);
+        let _ = write!(self.0, "{}: ", property_style.value(kv.key()));
+        let _ = serde_json::to_writer_pretty(&mut self.0, kv.value());
+    }
 }
 
 impl Builder {
@@ -412,6 +427,11 @@ impl Formatter {
 
     pub(crate) fn write_style(&self) -> WriteStyle {
         self.write_style
+    }
+
+    /// Get a serializer for writing record properties.
+    pub fn write_properties(&mut self, properties: &Properties) {
+        properties.serialize(&mut WriteProperties(self))
     }
 
     /// Begin a new [`Style`].

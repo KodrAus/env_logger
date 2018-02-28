@@ -259,7 +259,7 @@ impl Builder {
         Builder {
             filter: Default::default(),
             writer: Default::default(),
-            format: Box::new(|mut buf, record| {
+            format: Box::new(|buf, record| {
                 let ts = buf.timestamp();
                 let level = record.level();
                 let mut level_style = buf.style();
@@ -282,24 +282,9 @@ impl Builder {
                     write!(buf, "{}{} {}{} {}", brace_style.value("["), level, ts, brace_style.value("]"), record.args())
                 };
 
-                use log::properties::{KeyValues, KeyValue, Serializer};
-
-                struct WriteProperties<'a>(&'a mut fmt::Formatter);
-
-                impl<'a> Serializer for WriteProperties<'a> {
-                    fn serialize_kv(&mut self, kv: &KeyValue) {
-                        let mut property_style = self.0.style();
-                        property_style.set_bold(true);
-
-                        let _ = writeln!(self.0);
-                        let _ = write!(self.0, "{}: ", property_style.value(kv.key()));
-                        let _ = serde_json::to_writer_pretty(&mut self.0, kv.value());
-                    }
+                if let Some(properties) = record.properties() {
+                    buf.write_properties(properties);
                 }
-
-                
-
-                record.properties().serialize(&mut WriteProperties(&mut buf));
 
                 write.and(writeln!(buf))
             }),
