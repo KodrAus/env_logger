@@ -275,26 +275,31 @@ impl Builder {
                     Level::Error => level_style.set_color(Color::Red).set_bold(true).value("ERR"),
                 };
 
-                let mut write = if let Some(module_path) = record.module_path() {
+                let write = if let Some(module_path) = record.module_path() {
                     write!(buf, "{}{} {} {}{} {}", brace_style.value("["), level, ts, module_path, brace_style.value("]"), record.args())
                 }
                 else {
                     write!(buf, "{}{} {}{} {}", brace_style.value("["), level, ts, brace_style.value("]"), record.args())
                 };
 
-                let properties = record.properties();
-                if properties.any() {
-                    let mut property_style = buf.style();
-                    property_style.set_bold(true);
+                use log::properties::{KeyValues, KeyValue, Serializer};
 
-                    for property in properties {
-                        write = write
-                            .and(writeln!(buf))
-                            .and(write!(buf, "{}: ", property_style.value(property.key())))
-                            .and(serde_json::to_writer_pretty(&mut buf, property.value())
-                                .map_err(|e| io::Error::new(io::ErrorKind::Other, e)));
+                struct WriteProperties<'a>(&'a mut fmt::Formatter);
+
+                impl<'a> Serializer for WriteProperties<'a> {
+                    fn serialize_kv(&mut self, kv: &KeyValue) {
+                        let mut property_style = self.0.style();
+                        property_style.set_bold(true);
+
+                        let _ = writeln!(self.0);
+                        let _ = write!(self.0, "{}: ", property_style.value(kv.key()));
+                        let _ = serde_json::to_writer_pretty(&mut self.0, kv.value());
                     }
                 }
+
+                
+
+                record.properties().serialize(&mut WriteProperties(&mut buf));
 
                 write.and(writeln!(buf))
             }),
