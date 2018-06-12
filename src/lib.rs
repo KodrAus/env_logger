@@ -282,9 +282,7 @@ impl Builder {
                     write!(buf, "{}{} {}{} {}", brace_style.value("["), level, ts, brace_style.value("]"), record.args())
                 };
 
-                if let Some(properties) = record.properties() {
-                    buf.write_properties(properties);
-                }
+                buf.write_properties(record.properties());
 
                 write.and(writeln!(buf))
             }),

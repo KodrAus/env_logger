@@ -205,13 +205,13 @@ pub(crate) struct Builder {
 struct WriteProperties<'a>(&'a mut Formatter);
 
 impl<'a> Serializer for WriteProperties<'a> {
-    fn serialize_kv(&mut self, kv: &KeyValue) {
+    fn serialize_kv(&mut self, kv: &dyn KeyValue) {
         let mut property_style = self.0.style();
         property_style.set_bold(true);
 
         let _ = writeln!(self.0);
-        let _ = write!(self.0, "{}: ", property_style.value(kv.key()));
-        let _ = serde_json::to_writer_pretty(&mut self.0, kv.value());
+        let _ = write!(self.0, "   {}: ", property_style.value(kv.key()));
+        let _ = serde_json::to_writer(&mut self.0, &kv.value());
     }
 }
 
