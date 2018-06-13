@@ -282,7 +282,7 @@ impl Builder {
                     write!(buf, "{}{} {}{} {}", brace_style.value("["), level, ts, brace_style.value("]"), record.args())
                 };
 
-                buf.write_properties(record.properties());
+                buf.write_key_values(record.properties().key_values());
 
                 write.and(writeln!(buf))
             }),

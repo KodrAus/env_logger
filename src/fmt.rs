@@ -39,7 +39,7 @@ use std::{io, fmt};
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use log::properties::{Properties, KeyValues, KeyValue, Serializer};
+use log::properties::{KeyValues, KeyValue, Serializer};
 use serde_json;
 use termcolor::{ColorSpec, ColorChoice, Buffer, BufferWriter, WriteColor};
 use chrono::{DateTime, Utc};
@@ -430,8 +430,8 @@ impl Formatter {
     }
 
     /// Get a serializer for writing record properties.
-    pub fn write_properties(&mut self, properties: &Properties) {
-        properties.serialize(&mut WriteProperties(self))
+    pub fn write_key_values(&mut self, kvs: &dyn KeyValues) {
+        kvs.serialize(&mut WriteProperties(self))
     }
 
     /// Begin a new [`Style`].
