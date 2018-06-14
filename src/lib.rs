@@ -156,6 +156,8 @@ extern crate log;
 extern crate termcolor;
 extern crate chrono;
 extern crate atty;
+
+#[cfg(feature = "serde_json")]
 extern crate serde_json;
 
 use std::env;
@@ -282,7 +284,8 @@ impl Builder {
                     write!(buf, "{}{} {}{} {}", brace_style.value("["), level, ts, brace_style.value("]"), record.args())
                 };
 
-                buf.write_key_values(record.properties().key_values());
+                #[cfg(feature = "serde_json")]
+                buf.write_key_values(record.key_values());
 
                 write.and(writeln!(buf))
             }),

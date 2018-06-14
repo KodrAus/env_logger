@@ -39,8 +39,6 @@ use std::{io, fmt};
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use log::properties::{KeyValues, KeyValue, Serializer};
-use serde_json;
 use termcolor::{ColorSpec, ColorChoice, Buffer, BufferWriter, WriteColor};
 use chrono::{DateTime, Utc};
 use chrono::format::Item;
@@ -200,19 +198,6 @@ impl Writer {
 pub(crate) struct Builder {
     target: Target,
     write_style: WriteStyle,
-}
-
-struct WriteProperties<'a>(&'a mut Formatter);
-
-impl<'a> Serializer for WriteProperties<'a> {
-    fn serialize_kv(&mut self, kv: &dyn KeyValue) {
-        let mut property_style = self.0.style();
-        property_style.set_bold(true);
-
-        let _ = writeln!(self.0);
-        let _ = write!(self.0, "   {}: ", property_style.value(kv.key()));
-        let _ = serde_json::to_writer(&mut self.0, &kv.value());
-    }
 }
 
 impl Builder {
@@ -429,11 +414,6 @@ impl Formatter {
         self.write_style
     }
 
-    /// Get a serializer for writing record properties.
-    pub fn write_key_values(&mut self, kvs: &dyn KeyValues) {
-        kvs.serialize(&mut WriteProperties(self))
-    }
-
     /// Begin a new [`Style`].
     /// 
     /// # Examples
@@ -623,6 +603,34 @@ fn parse_write_style(spec: &str) -> WriteStyle {
         "always" => WriteStyle::Always,
         "never" => WriteStyle::Never,
         _ => Default::default(),
+    }
+}
+
+#[cfg(feature = "serde_json")]
+mod key_values {
+    use super::*;
+
+    use log::key_values::{KeyValues, KeyValue, Visitor};
+    use serde_json;
+
+    struct WriteKeyValues<'a>(&'a mut Formatter);
+
+    impl<'a> Visitor for WriteKeyValues<'a> {
+        fn visit_kv(&mut self, kv: &dyn KeyValue) {
+            let mut property_style = self.0.style();
+            property_style.set_bold(true);
+
+            let _ = writeln!(self.0);
+            let _ = write!(self.0, "   {}: ", property_style.value(kv.key()));
+            let _ = serde_json::to_writer(&mut self.0, &kv.value());
+        }
+    }
+
+    impl Formatter {
+        /// Write key value pairs.
+        pub fn write_key_values(&mut self, kvs: &dyn KeyValues) {
+            kvs.visit(&mut WriteKeyValues(self))
+        }
     }
 }
 
