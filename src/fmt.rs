@@ -622,6 +622,8 @@ mod key_values {
 
             let _ = writeln!(self.0);
             let _ = write!(self.0, "   {}: ", property_style.value(kv.key()));
+
+            // TODO: Write a simple serializer and avoid the dependency
             let _ = serde_json::to_writer(&mut self.0, &kv.value());
         }
     }
