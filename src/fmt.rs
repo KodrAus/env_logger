@@ -616,15 +616,13 @@ mod key_values {
     struct WriteKeyValues<'a>(&'a mut Formatter);
 
     impl<'a> Visitor for WriteKeyValues<'a> {
-        fn visit_key(&mut self, k: Key) {
+        fn visit_pair(&mut self, k: Key, v: Value) {
             let mut property_style = self.0.style();
             property_style.set_bold(true);
 
             let _ = writeln!(self.0);
             let _ = write!(self.0, "   {}: ", property_style.value(k));
-        }
 
-        fn visit_value(&mut self, v: Value) {
             // TODO: Write a simple serializer and avoid the dependency
             let _ = serde_json::to_writer(&mut self.0, &v);
         }
