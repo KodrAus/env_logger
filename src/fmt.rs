@@ -610,21 +610,23 @@ fn parse_write_style(spec: &str) -> WriteStyle {
 mod key_values {
     use super::*;
 
-    use log::key_values::{KeyValues, KeyValue, Visitor};
+    use log::key_values::{Key, Value, KeyValues, Visitor};
     use serde_json;
 
     struct WriteKeyValues<'a>(&'a mut Formatter);
 
     impl<'a> Visitor for WriteKeyValues<'a> {
-        fn visit_kv(&mut self, kv: &dyn KeyValue) {
+        fn visit_key(&mut self, k: Key) {
             let mut property_style = self.0.style();
             property_style.set_bold(true);
 
             let _ = writeln!(self.0);
-            let _ = write!(self.0, "   {}: ", property_style.value(kv.key()));
+            let _ = write!(self.0, "   {}: ", property_style.value(k));
+        }
 
+        fn visit_value(&mut self, v: Value) {
             // TODO: Write a simple serializer and avoid the dependency
-            let _ = serde_json::to_writer(&mut self.0, &kv.value());
+            let _ = serde_json::to_writer(&mut self.0, &v);
         }
     }
 
