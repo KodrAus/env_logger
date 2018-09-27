@@ -615,8 +615,8 @@ mod key_values {
 
     struct WriteKeyValues<'a>(&'a mut Formatter);
 
-    impl<'a> Visitor for WriteKeyValues<'a> {
-        fn visit_pair(&mut self, k: Key, v: Value) {
+    impl<'a, 'kvs> Visitor<'kvs> for WriteKeyValues<'a> {
+        fn visit_pair<'vis>(&'vis mut self, k: Key<'kvs>, v: Value<'kvs>) {
             let mut property_style = self.0.style();
             property_style.set_bold(true);
 
