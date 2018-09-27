@@ -610,12 +610,12 @@ fn parse_write_style(spec: &str) -> WriteStyle {
 mod key_values {
     use super::*;
 
-    use log::key_values::{Key, Value, KeyValues, Visitor};
+    use log::key_values::{Key, Value, KeyValueSource, Visitor};
     use serde_json;
 
-    struct WriteKeyValues<'a>(&'a mut Formatter);
+    struct WriteKeyValueSource<'a>(&'a mut Formatter);
 
-    impl<'a, 'kvs> Visitor<'kvs> for WriteKeyValues<'a> {
+    impl<'a, 'kvs> Visitor<'kvs> for WriteKeyValueSource<'a> {
         fn visit_pair<'vis>(&'vis mut self, k: Key<'kvs>, v: Value<'kvs>) {
             let mut property_style = self.0.style();
             property_style.set_bold(true);
@@ -630,8 +630,8 @@ mod key_values {
 
     impl Formatter {
         /// Write key value pairs.
-        pub fn write_key_values(&mut self, kvs: &dyn KeyValues) {
-            kvs.visit(&mut WriteKeyValues(self))
+        pub fn write_key_values(&mut self, kvs: &dyn KeyValueSource) {
+            kvs.visit(&mut WriteKeyValueSource(self))
         }
     }
 }
