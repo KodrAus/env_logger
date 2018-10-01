@@ -160,6 +160,9 @@ extern crate atty;
 #[cfg(feature = "structured")]
 extern crate serde;
 
+#[cfg(feature = "json")]
+extern crate serde_json;
+
 use std::env;
 use std::borrow::Cow;
 use std::io::prelude::*;
@@ -174,6 +177,9 @@ pub mod fmt;
 
 #[cfg(feature = "structured")]
 mod key_values;
+
+#[cfg(feature = "json")]
+mod json;
 
 pub use self::fmt::{Target, WriteStyle, Color, Formatter};
 
