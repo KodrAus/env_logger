@@ -157,8 +157,8 @@ extern crate termcolor;
 extern crate chrono;
 extern crate atty;
 
-#[cfg(feature = "serde_json")]
-extern crate serde_json;
+#[cfg(feature = "structured")]
+extern crate serde;
 
 use std::env;
 use std::borrow::Cow;
@@ -171,6 +171,9 @@ use log::{Log, LevelFilter, Level, Record, SetLoggerError, Metadata};
 
 pub mod filter;
 pub mod fmt;
+
+#[cfg(feature = "structured")]
+mod key_values;
 
 pub use self::fmt::{Target, WriteStyle, Color, Formatter};
 
@@ -284,7 +287,6 @@ impl Builder {
                     write!(buf, "{}{} {}{} {}", brace_style.value("["), level, ts, brace_style.value("]"), record.args())
                 };
 
-                #[cfg(feature = "serde_json")]
                 buf.write_key_values(record.key_values());
 
                 write.and(writeln!(buf))
