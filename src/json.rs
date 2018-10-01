@@ -50,6 +50,8 @@ where
         map.serialize_entry("msg", &self.msg)?;
 
         self.props
+            .as_ref()
+            .sort_retain_last()
             .try_for_each(|k, v| map.serialize_entry(&k, &v))
             .map_err(S::Error::custom)?;
 
