@@ -157,11 +157,15 @@ extern crate termcolor;
 extern crate chrono;
 extern crate atty;
 
-#[cfg(feature = "structured")]
+#[cfg(feature = "serde")]
 extern crate serde;
 
-#[cfg(feature = "json")]
+#[cfg(feature = "serde_json")]
 extern crate serde_json;
+
+#[cfg(feature = "serde_derive")]
+#[macro_use]
+extern crate serde_derive;
 
 use std::env;
 use std::borrow::Cow;
