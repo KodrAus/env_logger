@@ -299,7 +299,7 @@ impl Builder {
 
                 buf.write_key_values(record.key_values());
 
-                write.and(writeln!(buf))
+                write
             }),
         }
     }

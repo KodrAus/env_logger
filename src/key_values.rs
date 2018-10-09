@@ -8,7 +8,7 @@ use serde::ser::{self, Serialize};
 struct WriteKeyValueSource<'a>(&'a mut Formatter);
 
 impl<'a, 'kvs> Visitor<'kvs> for WriteKeyValueSource<'a> {
-    fn visit_pair<'vis>(&'vis mut self, k: Key<'kvs>, v: Value<'kvs>) -> Result<(), Error> {
+    fn visit_pair(&mut self, k: Key<'kvs>, v: Value<'kvs>) -> Result<(), Error> {
         let property_style = self.0.property_style();
         write!(self.0, "{}", property_style.value(k))?;
 
