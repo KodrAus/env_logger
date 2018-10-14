@@ -20,13 +20,17 @@ extern crate log;
 extern crate env_logger;
 
 fn main() {
+    use std::fmt::Debug;
+
     env_logger::init_from_env("MY_LOG_LEVEL");
 
-    log!(log::Level::Info, msg: { "A structured {name}", name = "log" }, kvs: {
-        id: 1,
-        #[log(display)]
-        name: "log",
-        #[log(path)]
-        path: "./monkey-path",
+    let correlation_id = 123;
+    let user = "some user";
+
+    log!(log::Level::Info, msg: { "This is the rendered {message}. It is not structured", message = "message" }, kvs: {
+        #[log(fmt = Debug::fmt)]
+        correlation: correlation_id,
+        #[log(serde)]
+        user: user,
     });
 }
