@@ -32,6 +32,6 @@ name = "log-in-log"
 harness = false
 
 [features]
-default = ["regex", "structured"]
-structured = ["serde", "log/structured"]
-json = ["serde_json", "serde_derive"]
+default = ["regex"]
+structured_serde = ["serde", "log/structured_serde"]
+json = ["structured_serde", "serde_json", "serde_derive"]

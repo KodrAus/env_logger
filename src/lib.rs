@@ -178,8 +178,6 @@ use log::{Log, LevelFilter, Level, Record, SetLoggerError, Metadata};
 
 pub mod filter;
 pub mod fmt;
-
-#[cfg(feature = "structured")]
 mod key_values;
 
 #[cfg(feature = "json")]

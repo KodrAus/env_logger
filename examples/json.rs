@@ -26,12 +26,12 @@ fn main() {
 
     log!(log::Level::Info, msg: { "A structured {name}", name = "log" }, kvs: {
         id: 1,
-        #[log(display)]
         name: "log",
-        #[log(path)]
         path: "./monkey-path",
     });
 }
 
 #[cfg(not(feature = "json"))]
-fn main() {}
+fn main() {
+    panic!("compile with the `json` feature to run this example")
+}
