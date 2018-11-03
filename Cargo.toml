@@ -33,5 +33,5 @@ harness = false
 
 [features]
 default = ["regex"]
-structured_serde = ["serde", "log/structured_serde"]
-json = ["structured_serde", "serde_json", "serde_derive"]
+kv_serde = ["serde", "log/kv_serde"]
+json = ["kv_serde", "serde_json", "serde_derive"]

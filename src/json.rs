@@ -1,7 +1,7 @@
 use std::io::{self, Write};
 use serde_json;
 use log::{Level, Record};
-use log::key_values::Source;
+use log::kv::Source;
 
 use super::Builder;
 use super::fmt::Formatter;
