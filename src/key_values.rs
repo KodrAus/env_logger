@@ -2,7 +2,7 @@ use std::io::Write;
 
 use super::fmt::*;
 
-use log::kv::Source;
+use log::key_values::Source;
 
 impl Formatter {
     fn property_style(&self) -> Style {

@@ -1,7 +1,7 @@
 use std::io::{self, Write};
 use serde_json;
 use log::{Level, Record};
-use log::kv::Source;
+use log::key_values::Source;
 
 use super::Builder;
 use super::fmt::Formatter;
@@ -18,7 +18,7 @@ fn json(mut f: &mut Formatter, r: &Record) -> io::Result<()> {
         level: r.level(),
         timestamp: f.timestamp().to_string(),
         msg: r.args().to_string(),
-        props: r.key_values().serialize_as_map(),
+        props: r.key_values().as_map(),
     };
 
     serde_json::to_writer(&mut f, &r)?;

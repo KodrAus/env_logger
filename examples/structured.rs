@@ -19,7 +19,7 @@ $ export MY_LOG_STYLE=never
 extern crate log;
 extern crate env_logger;
 
-use log::kv::source;
+use log::key_values::source;
 
 fn main() {
     env_logger::init_from_env("MY_LOG_LEVEL");

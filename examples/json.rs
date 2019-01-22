@@ -26,7 +26,7 @@ extern crate serde_json;
 #[cfg(feature = "json")]
 fn main() {
     use serde_json::json;
-    use log::kv::source;
+    use log::key_values::source;
 
     let mut builder = env_logger::Builder::from_env("MY_LOG_LEVEL");
     builder.json_format().init();
